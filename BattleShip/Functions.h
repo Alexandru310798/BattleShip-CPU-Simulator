@@ -3,11 +3,12 @@
 #include<math.h>
 #include<algorithm>
 #include "Ship.cpp"
+#include<list>
 using namespace std;
 
 int GetRandomNumber()
 {
-	return rand() % 100 + 0;				//un numar random pentru atacul navei
+	return rand() % 100 + 0;				//un numar generat random folosit pentru atacul unei nave, cat si pentru generarea lor, ca si pozitii
 }
 
 void DisplayTopLine()
@@ -64,38 +65,55 @@ void DisplayShips(Ship first, Ship second)
 	DisplayBottomLine();						//afiseaza linia de jos a tabloului
 }
 
+bool AlreadyExists(list<int> L, int value)
+{
+	if (find(L.begin(), L.end(), value) != L.end())
+	{
+		return true;
+	}
+	return false;
+}
+
+void ShowListOfBoats(list<int> L)
+{
+	cout << endl << "Lista barcilor generate pe pozitiile: ";
+	list<int>::iterator it;
+	for (it = L.begin(); it != L.end(); it++)
+	{
+		cout << *it << " ";
+	}
+	cout << endl;
+}
+
 void ReadAndUpdate(int noBoat, Ship& boat)
 {
 	cout << "CPU " << noBoat << " : " << endl;
-	int aux = 1;
-	cout << "Introduceti '0' pentru a termina de introdus barcile" << endl;
-	
-	while (aux)
+	int numberBoats = 1;
+	cout << "Numarul de barci pe care il doriti: ";
+	cin >> numberBoats;
+	list<int> listBoats;
+	while (numberBoats)
 	{
-		cout << "Pozitia pentru barca este: ";
-		cin >> aux;
-		if (aux == 0) 
+		int aux = GetRandomNumber();
+		while (AlreadyExists(listBoats, aux))		// cat timp deja exista o barca pe acea pozitie, cautam o alta pozitie libera
 		{
-			cout << "Ati terminat de introdus barci" << endl << endl << endl;
-			return;
+			aux = GetRandomNumber();
 		}
-		else if (aux < 0 || aux > 99)
-		{
-			cout << "Numar gresit!" << endl;
-		}
-		else
-		{
-			boat.UpdateShip(aux);
-		}
+		listBoats.push_back(aux);
+		boat.UpdateShip(aux);
+		numberBoats--;
 	}
+	
+	ShowListOfBoats(listBoats);
 }
 
-void Play(Ship& first, Ship& second)
+
+void Play(Ship& first, Ship& second, int maxMoves)
 {
 	cout << endl << endl << endl << "Tablou inital:" << endl << endl;
 	DisplayShips(first, second);
 	cout << endl << endl;
-
+	int iterations = 0;
 	while (1 == 1)			//loop infinit cu iesire doar la terminarea jocului
 	{
 		if (first.NoShips())				//daca 1 nu mai are nave, a castigat 2 si stop joc
@@ -127,6 +145,13 @@ void Play(Ship& first, Ship& second)
 		else cout << "A dat pe langa!" << endl;
 
 		DisplayShips(first,second);
+
+		iterations++;
+		if (iterations == maxMoves)
+		{
+			cout << "S-au facut 100 de miscari, nimeni nu a castigat." << endl << "Rezultatul este unul de egalitate";
+			return;
+		}
 	}
 
 }
