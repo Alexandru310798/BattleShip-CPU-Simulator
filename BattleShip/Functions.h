@@ -106,10 +106,16 @@ void ReadAndUpdate(int noBoat, Ship& boat)
 	
 	ShowListOfBoats(listBoats);
 }
+void ShowAccuracy(int h1, int m1, int h2, int m2)
+{
+	cout << "CPU 1 a efectuat " << h1 + m1 << " miscari, din care a lovit " << h1 << " barci. Inseamna o precizie de " << (float)(h1) / (float)(h1 + m1) << "%" << endl;
+	cout << "CPU 2 a efectuat " << h2 + m2 << " miscari, din care a lovit " << h2 << " barci. Inseamna o precizie de " << (float)(h2) / (float)(h2 + m2) << "%" << endl;
 
+}
 
 void Play(Ship& first, Ship& second, int maxMoves)
-{
+{	
+	int missed_1 = 0, hitted_1 = 0, missed_2 = 0, hitted_2 = 0;
 	cout << endl << endl << endl << "Tablou inital:" << endl << endl;
 	DisplayShips(first, second);
 	cout << endl << endl;
@@ -119,11 +125,13 @@ void Play(Ship& first, Ship& second, int maxMoves)
 		if (first.NoShips())				//daca 1 nu mai are nave, a castigat 2 si stop joc
 		{
 			cout << "CPU 2 a castigat, CPU 1 nu mai are nave" << endl;
+			ShowAccuracy(hitted_1, missed_1, hitted_2, missed_2);
 			return;
 		}
 		if (second.NoShips())			   //daca 2 nu mai are nave,  a castigat 1 si stop joc
 		{
 			cout << "CPU 1 a castigat, CPU 2 nu mai are nave" << endl;
+			ShowAccuracy(hitted_1, missed_1, hitted_2, missed_2);
 			return;
 		}
 		int aux = GetRandomNumber();
@@ -131,18 +139,28 @@ void Play(Ship& first, Ship& second, int maxMoves)
 		if (second.VerifyShip(aux))					//verifica daca a lovit o nava sau nu
 		{
 			cout << "A lovit o barca!" << endl;
+			hitted_1++;
 			second.DestroyShip(aux);
 		}
-		else cout << "A dat pe langa!" << endl;
+		else 
+		{
+			missed_1++;
+			cout << "A dat pe langa!" << endl; 
+		}
 		
 		aux = GetRandomNumber();
 		cout << "CPU 2 a ales: " << aux << endl;
 		if (first.VerifyShip(aux))					//verifica daca a lovit o nava sau nu
 		{
 			cout << "A lovit o barca!" << endl;
+			hitted_2++;
 			first.DestroyShip(aux);
 		}
-		else cout << "A dat pe langa!" << endl;
+		else 
+		{
+			missed_2++;
+			cout << "A dat pe langa!" << endl;
+		}
 
 		DisplayShips(first,second);
 
@@ -150,6 +168,7 @@ void Play(Ship& first, Ship& second, int maxMoves)
 		if (iterations == maxMoves)
 		{
 			cout << "S-au facut 100 de miscari, nimeni nu a castigat." << endl << "Rezultatul este unul de egalitate";
+			ShowAccuracy(hitted_1, missed_1, hitted_2, missed_2);
 			return;
 		}
 	}
